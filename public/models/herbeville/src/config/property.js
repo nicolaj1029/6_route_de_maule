@@ -35,8 +35,7 @@ export const PROPERTY = {
   ],
 
   photos: [
-    { src: assetPath('images/terrain-01.webp'), alt: 'Vue principale du terrain' },
-    { src: assetPath('images/terrain-02.webp'), alt: 'Vue depuis la route' },
-    { src: assetPath('images/terrain-03.webp'), alt: 'Vue aerienne du terrain' },
+    { src: assetPath('images/terrain-01.png'), alt: 'Render principal du terrain' },
+    { src: assetPath('images/terrain-02.png'), alt: 'Vue d ensemble du site' },
   ],
 }

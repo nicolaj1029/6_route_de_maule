@@ -1,58 +1,84 @@
-# CakePHP Application Skeleton
+# 6 Route de Maule
 
-![Build Status](https://github.com/cakephp/app/actions/workflows/ci.yml/badge.svg?branch=5.x)
-[![Total Downloads](https://img.shields.io/packagist/dt/cakephp/app.svg?style=flat-square)](https://packagist.org/packages/cakephp/app)
-[![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
+Prototype for en salgsorienteret, interaktiv grundside for:
 
-A skeleton for creating applications with [CakePHP](https://cakephp.org) 5.x.
+- `6 Route Maule, Herbeville, France`
+- koordinater `48.90785295, 1.87884956`
 
-The framework source code can be found here: [cakephp/cakephp](https://github.com/cakephp/cakephp).
+Repoet bestar af to lag:
 
-## Installation
+- en CakePHP-wrapper, der hoster frontend-buildet lokalt via `/herbeville`
+- en React/Vite-frontend i `public/models/herbeville`
 
-1. Download [Composer](https://getcomposer.org/doc/00-intro.md) or update `composer self-update`.
-2. Run `php composer.phar create-project --prefer-dist cakephp/app [app_name]`.
+## Lokale URL'er
 
-If Composer is installed globally, run
+- Cake entrypoint: `http://localhost/6_route_de_Maule/herbeville`
+- direkte build: `http://localhost/6_route_de_Maule/herbeville-app/index.html`
 
-```bash
-composer create-project --prefer-dist cakephp/app
+## Frontend
+
+Frontend-kilde ligger her:
+
+```text
+public/models/herbeville
 ```
 
-In case you want to use a custom app dir name (e.g. `/myapp/`):
+Lokal Cake-build:
 
 ```bash
-composer create-project --prefer-dist cakephp/app myapp
+cd public/models/herbeville
+npm install
+npm run build
 ```
 
-You can now either use your machine's webserver to view the default home page, or start
-up the built-in webserver with:
+Det skriver til:
+
+```text
+webroot/herbeville-app
+```
+
+Statisk GitHub Pages-build:
 
 ```bash
-bin/cake server -p 8765
+cd public/models/herbeville
+npm run build:pages
 ```
 
-Then visit `http://localhost:8765` to see the welcome page.
+Det skriver til:
 
-## Demo app
+```text
+public/models/herbeville/dist
+```
 
-Check out the [5.x-demo branch](https://github.com/cakephp/app/tree/5.x-demo), which contains demo migrations and a seeder.
-See the [README](https://github.com/cakephp/app/blob/5.x-demo/README.md) on how to get it running.
+## Blender asset flow
 
-## Update
+Arbejdsmateriale:
 
-Since this skeleton is a starting point for your application and various files
-would have been modified as per your needs, there isn't a way to provide
-automated upgrades, so you have to do any updates manually.
+```text
+resources/blender/scenes
+resources/blender/renders
+resources/blender/exports
+resources/blender/textures
+resources/blender/references
+```
 
-## Configuration
+Kun web-klare filer kopieres til:
 
-Read and edit the environment specific `config/app_local.php` and set up the
-`'Datasources'` and any other configuration relevant for your application.
-Other environment agnostic settings can be changed in `config/app.php`.
+```text
+public/models/herbeville/public/images
+public/models/herbeville/public/models
+```
 
-## Layout
+## GitHub Pages
 
-The app skeleton uses [Milligram](https://milligram.io/) (v1.3) minimalist CSS
-framework by default. You can, however, replace it with any other library or
-custom styles.
+Workflow:
+
+```text
+.github/workflows/deploy-herbeville-pages.yml
+```
+
+For at aktivere deployment:
+
+1. Gaa til `Settings -> Pages`
+2. Vaelg `Build and deployment: GitHub Actions`
+3. Push til `main`

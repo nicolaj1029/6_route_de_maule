@@ -1,9 +1,8 @@
 # 6 Route Maule - Herbeville
 ### Prototype de salgsside v2
 
-React/Vite-salgsside for byggegrunden i Herbeville, hostet af CakePHP og bygget til `webroot/herbeville-app/`.
-
----
+React/Vite-salgsside for byggegrunden i Herbeville, hostet af CakePHP lokalt og
+også klar til statisk deploy via GitHub Pages.
 
 ## Kom i gang
 
@@ -11,27 +10,20 @@ React/Vite-salgsside for byggegrunden i Herbeville, hostet af CakePHP og bygget 
 npm install
 npm run dev
 npm run build
+npm run build:pages
 ```
 
-`npm run dev` starter lokal Vite-udvikling.
-
-`npm run build` skriver den kompilerede app til:
-
-```bash
-webroot/herbeville-app/
-```
-
-og Cake-routen `/herbeville` peger derefter videre til buildet.
-
----
+- `npm run dev` starter lokal Vite-udvikling.
+- `npm run build` skriver den lokale Cake-build til `webroot/herbeville-app/`.
+- `npm run build:pages` skriver en statisk Pages-build til `public/models/herbeville/dist/`.
 
 ## Filstruktur
 
 ```text
 public/models/herbeville/
   public/
-    images/           <- Hero-fotos
-    models/           <- GLB-filer fra Blender
+    images/           <- Hero-fotos og renders
+    models/           <- Web-klare GLB-filer
   src/
     components/
     config/
@@ -40,53 +32,68 @@ public/models/herbeville/
   vite.config.js
 ```
 
----
-
 ## Aktivering af moduler
 
 ### 1. Rigtige fotos
-Placer 3 filer i `public/models/herbeville/public/images/`:
+Placer billeder i:
 
 ```text
-terrain-01.webp
-terrain-02.webp
-terrain-03.webp
+public/models/herbeville/public/images/
+```
+
+Nu bruges der allerede:
+
+```text
+terrain-01.png
+terrain-02.png
 ```
 
 ### 2. GLB-modeller
-Placer Blender-eksporter i `public/models/herbeville/public/models/`:
+Placer Blender-eksporter i:
+
+```text
+public/models/herbeville/public/models/
+```
+
+Siden understoetter nu:
 
 ```text
 villa-moderne.glb
 maison-normande.glb
 chalet-bois.glb
 bungalow.glb
+parcel-a-maison-normande.glb
+parcel-b-villa-moderne.glb
+site-context.glb
 ```
 
 ### 3. Kontaktformular
 Opdater `formspreeId` i `src/config/property.js`.
 
 ### 4. AI-assistent
-Frontend kalder nu den lokale Cake-endpoint:
+Frontend kalder forst den lokale Cake-endpoint:
 
 ```text
 POST /api/design-assistant
 ```
 
-Det er en lokal regelmotor nu, men endpointet kan senere erstattes af en rigtig LLM-proxy uden at ændre frontend-kontrakten.
+Hvis endpointet ikke findes, falder frontend automatisk tilbage til lokal
+regelbaseret fortolkning. Det gor GitHub Pages-versionen brugbar uden backend.
 
 ### 5. 3D og performance
 - `model-viewer` loades kun ved aktivering af 3D-sektionen.
-- Vite buildes med relative asset-paths, saa appen virker baade i webroot og under en undermappe.
-- Assets refereres via `import.meta.env.BASE_URL`, så de virker under Cake-webroot.
+- Vite bruger base-aware asset paths via `import.meta.env.BASE_URL`.
+- Brugeren kan nu skifte mellem husmodel, parcel-variant og site-context, nar de findes.
 
----
+### 6. GitHub Pages deploy
+Workflow ligger i:
 
-## Tech stack
+```text
+.github/workflows/deploy-herbeville-pages.yml
+```
 
-- React 18 + Vite 5
-- CSS Modules
-- CakePHP som host for build og lokal AI-endpoint
-- `@google/model-viewer` on demand
-- Formspree til kontaktformular
-- Cesium-klar map-slot til senere
+For at aktivere:
+
+1. Gaa til repoets `Settings -> Pages`
+2. Vaelg `Build and deployment: GitHub Actions`
+3. Push til `main`

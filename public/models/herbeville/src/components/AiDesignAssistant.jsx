@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { inferDesignAssistantConfig } from '../config/designAssistantFallback.js'
 import styles from './AiDesignAssistant.module.css'
 
 const EXAMPLES = [
@@ -16,6 +17,16 @@ export default function AiDesignAssistant({ setConfig }) {
   const fillPrompt = (text) => {
     setPrompt(text)
     runAI(text)
+  }
+
+  const applyConfig = (nextConfig) => {
+    setConfig((current) => ({
+      ...current,
+      house: nextConfig.house || current.house,
+      roof: nextConfig.roof || current.roof,
+      garden: Array.isArray(nextConfig.garden) && nextConfig.garden.length > 0 ? nextConfig.garden : current.garden,
+      mood: nextConfig.mood || current.mood,
+    }))
   }
 
   const runAI = async (inputOverride) => {
@@ -43,13 +54,7 @@ export default function AiDesignAssistant({ setConfig }) {
       const data = await res.json()
 
       if (data?.config) {
-        setConfig((current) => ({
-          ...current,
-          house: data.config.house || current.house,
-          roof: data.config.roof || current.roof,
-          garden: Array.isArray(data.config.garden) && data.config.garden.length > 0 ? data.config.garden : current.garden,
-          mood: data.config.mood || current.mood,
-        }))
+        applyConfig(data.config)
       }
 
       setResponse({
@@ -59,7 +64,15 @@ export default function AiDesignAssistant({ setConfig }) {
         source: data?.source ?? '',
       })
     } catch {
-      setResponse({ error: true })
+      const fallback = inferDesignAssistantConfig(input)
+      applyConfig(fallback.config)
+
+      setResponse({
+        desc: fallback.desc,
+        blender: fallback.blender,
+        tags: fallback.tags,
+        source: fallback.source,
+      })
     } finally {
       setLoading(false)
     }
@@ -108,7 +121,7 @@ export default function AiDesignAssistant({ setConfig }) {
             </div>
           )}
 
-          {response && !response.error && (
+          {response && (
             <div className={styles.responseBox}>
               {response.desc && <p className={styles.desc}>{response.desc}</p>}
               {response.tags.length > 0 && (
@@ -122,14 +135,6 @@ export default function AiDesignAssistant({ setConfig }) {
               {response.source && (
                 <p className={styles.meta}>Source: {response.source}</p>
               )}
-            </div>
-          )}
-
-          {response?.error && (
-            <div className={styles.responseBox}>
-              <p style={{ color: 'var(--terracotta)', fontSize: '0.82rem' }}>
-                Erreur de connexion. Verifiez la route Cake `/api/design-assistant`.
-              </p>
             </div>
           )}
         </div>

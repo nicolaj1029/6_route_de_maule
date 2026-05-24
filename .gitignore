@@ -48,6 +48,7 @@ nbproject/*
 # node
 /node_modules/*
 /public/models/herbeville/node_modules/
+/public/models/herbeville/dist/
 /webroot/herbeville-app/
 /resources/blender/renders/*.tmp
 /resources/blender/renders/*.bak

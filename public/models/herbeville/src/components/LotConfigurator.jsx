@@ -72,8 +72,9 @@ export default function LotConfigurator({ config, setConfig }) {
       <div className={styles.infoBox}>
         <InfoIcon />
         <p>
-          La vue 3D reste volontairement sobre pour la premiere version. Tant que les fichiers GLB
-          ne sont pas ajoutes, la page garde un fallback illustratif pour rester rapide sur mobile.
+          La vue 3D reste volontairement sobre pour la premiere version. Quand les exports existent,
+          vous pouvez maintenant alterner entre le volume maison, la projection sur parcelle et
+          le contexte global du site.
         </p>
       </div>
     </section>

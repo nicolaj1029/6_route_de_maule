@@ -1,0 +1,26 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.card {
+  border: 1.5px solid var(--stone);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 0.75rem;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  text-align: center;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.card:hover { border-color: var(--warm); }
+.selected { border-color: var(--terracotta); background: #FDF8F5; }
+
+.icon { font-size: 1.6rem; }
+.name { font-size: 0.78rem; font-weight: 500; color: var(--night); }
+.desc { font-size: 0.66rem; color: var(--muted); }

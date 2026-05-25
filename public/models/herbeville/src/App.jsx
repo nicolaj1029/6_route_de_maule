@@ -9,7 +9,7 @@ import ContactSection from './components/ContactSection.jsx'
 import Footer from './components/Footer.jsx'
 
 export default function App() {
-  const [config, setConfig] = useState({ house: 'normande', garden: [] })
+  const [config, setConfig] = useState({ house: 'normande', parcelId: 'A', garden: [] })
 
   return (
     <>

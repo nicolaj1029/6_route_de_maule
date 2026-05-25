@@ -1,49 +1,63 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { PROPERTY } from '../config/property.js'
 import s from './Hero.module.css'
 
 export default function Hero() {
-  const [idx, setIdx] = useState(0)
-  const [loaded, setLoaded] = useState({})
+  const hasVideo = Boolean(PROPERTY.heroVideo?.src)
+  const fallbackSlide = useMemo(() => PROPERTY.heroSlides[0], [])
+  const videoRef = useRef(null)
+  const restartTimerRef = useRef(null)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIdx((current) => (current + 1) % PROPERTY.heroSlides.length)
-    }, 6000)
+  useEffect(
+    () => () => {
+      if (restartTimerRef.current) {
+        window.clearTimeout(restartTimerRef.current)
+      }
+    },
+    [],
+  )
 
-    return () => clearInterval(timer)
-  }, [])
+  const handleVideoEnded = () => {
+    if (restartTimerRef.current) {
+      window.clearTimeout(restartTimerRef.current)
+    }
+
+    restartTimerRef.current = window.setTimeout(() => {
+      const video = videoRef.current
+      if (!video) return
+      video.currentTime = 0
+      video.play().catch(() => {})
+    }, 5000)
+  }
 
   return (
     <section className={s.hero}>
       <div className={s.slides}>
-        {PROPERTY.heroSlides.map((slide, index) => (
-          <div key={slide.label} className={`${s.slide} ${index === idx ? s.slideActive : ''}`}>
-            <img
-              src={slide.src}
-              alt={slide.label}
-              className={s.slideImg}
-              onLoad={() => setLoaded((prev) => ({ ...prev, [index]: true }))}
-            />
-            {!loaded[index] && <div className={s.slidePlaceholder} style={{ '--n': index }} />}
+        {hasVideo ? (
+          <div className={`${s.slide} ${s.slideActive}`}>
+            <video
+              ref={videoRef}
+              className={s.heroVideo}
+              autoPlay
+              muted
+              playsInline
+              preload="metadata"
+              poster={PROPERTY.heroVideo.poster}
+              onEnded={handleVideoEnded}
+            >
+              <source src={PROPERTY.heroVideo.src} type="video/mp4" />
+            </video>
           </div>
-        ))}
+        ) : (
+          <div className={`${s.slide} ${s.slideActive}`}>
+            <img src={fallbackSlide.src} alt={fallbackSlide.label} className={s.slideImg} />
+          </div>
+        )}
         <div className={s.gradient} />
       </div>
 
       <div className={s.slideInfo}>
-        <span className={s.slideLabel}>{PROPERTY.heroSlides[idx].label}</span>
-        <div className={s.dots}>
-          {PROPERTY.heroSlides.map((slide, index) => (
-            <button
-              key={slide.label}
-              className={`${s.dot} ${index === idx ? s.dotActive : ''}`}
-              onClick={() => setIdx(index)}
-              aria-label={`Afficher ${slide.label}`}
-              type="button"
-            />
-          ))}
-        </div>
+        <span className={s.slideLabel}>{hasVideo ? PROPERTY.heroVideo.label : fallbackSlide.label}</span>
       </div>
 
       <div className={s.content}>
@@ -57,8 +71,7 @@ export default function Hero() {
 
         <p className={`t-body anim-fade-up anim-delay-2 ${s.sub}`}>
           Deux parcelles constructibles au coeur du Vexin francais.
-          <br />
-          A moins d&apos;une heure de Paris, dans un village preserve avec vues ouvertes sur la campagne.
+          <br />A moins d&apos;une heure de Paris, dans un village preserve avec vues ouvertes sur la campagne.
         </p>
 
         <div className={`anim-fade-up anim-delay-3 ${s.ctas}`}>
@@ -84,7 +97,9 @@ export default function Hero() {
       </div>
 
       <div className={s.gpsBadge}>
-        <code>{PROPERTY.lat.toFixed(5)} N - {PROPERTY.lng.toFixed(5)} E</code>
+        <code>
+          {PROPERTY.lat.toFixed(5)} N - {PROPERTY.lng.toFixed(5)} E
+        </code>
       </div>
 
       <div className={s.scrollHint}>

@@ -13,7 +13,7 @@ const TIMBER = new Color('#9a7148')
 const CYPRESS = new Color('#2f4b31')
 const OLIVE = new Color('#7e9362')
 
-export default function ThreeSceneViewer({ house, placedElements, onClose }) {
+export default function ThreeSceneViewer({ house, housePlacement, placedElements, onClose }) {
   const { width, depth } = house.parcel
 
   return (
@@ -25,7 +25,7 @@ export default function ThreeSceneViewer({ house, placedElements, onClose }) {
           <ambientLight intensity={1.15} />
           <directionalLight position={[18, 26, 14]} intensity={2.2} castShadow />
           <Suspense fallback={null}>
-            <ParcelScene house={house} placedElements={placedElements} />
+            <ParcelScene house={house} housePlacement={housePlacement} placedElements={placedElements} />
           </Suspense>
           <OrbitControls
             enablePan={false}
@@ -40,7 +40,7 @@ export default function ThreeSceneViewer({ house, placedElements, onClose }) {
       <div className={s.bar}>
         <div className={s.meta}>
           <span className={s.label}>{house.label}</span>
-          <span className={s.dimensions}>Parcelle {width} m x {depth} m</span>
+          <span className={s.dimensions}>Parcelle {house.parcelId} · {width} m x {depth} m</span>
           <span className={s.note}>Les ajouts jardin sont convertis du plan 2D vers cette base metriquement stable.</span>
         </div>
         <button className={s.closeBtn} onClick={onClose} type="button">
@@ -51,18 +51,13 @@ export default function ThreeSceneViewer({ house, placedElements, onClose }) {
   )
 }
 
-function ParcelScene({ house, placedElements }) {
-  const { width, depth, houseWidth, houseDepth, houseX, houseZ, rotation } = house.parcel
-  const housePosition = useMemo(() => [-(width / 2) + houseX, 0, -(depth / 2) + houseZ], [width, houseX, depth, houseZ])
-  const sceneItems = useMemo(
-    () =>
-      placedElements.map((item) => ({
-        ...item,
-        sceneX: (item.x / 100 - 0.5) * width,
-        sceneZ: (item.y / 100 - 0.5) * depth,
-      })),
-    [placedElements, width, depth],
+function ParcelScene({ house, housePlacement, placedElements }) {
+  const { width, depth, houseWidth, houseDepth, rotation } = house.parcel
+  const housePosition = useMemo(
+    () => [-(width / 2) + housePlacement.x, 0, -(depth / 2) + housePlacement.z],
+    [depth, housePlacement.x, housePlacement.z, width],
   )
+  const sceneItems = useMemo(() => placedElements, [placedElements])
 
   return (
     <group>
@@ -86,7 +81,7 @@ function ParcelScene({ house, placedElements }) {
       />
 
       {sceneItems.map((item) => (
-        <GardenObject key={item.id} item={item} />
+        <GardenObject key={item.id} item={item} parcelWidth={width} parcelDepth={depth} />
       ))}
     </group>
   )
@@ -120,6 +115,7 @@ function ScaledHouseModel({ glb, footprint, position, rotation }) {
   const { scene } = useGLTF(glb)
   const { cloned, scale, center, minY } = useMemo(() => {
     const clone = scene.clone(true)
+    stripEmbeddedSiteElements(clone)
     const box = new Box3().setFromObject(clone)
     const size = new Vector3()
     const centerVec = new Vector3()
@@ -144,24 +140,48 @@ function ScaledHouseModel({ glb, footprint, position, rotation }) {
   )
 }
 
-function GardenObject({ item }) {
+function stripEmbeddedSiteElements(root) {
+  const hiddenKeywords = ['ground', 'path', 'gravel', 'pool', 'terrace']
+  const hiddenNodePrefixes = ['M_Ground', 'M_Terrace', 'M_Pool', 'N_Ground', 'N_Path', 'BG_Ground', 'BG_Gravel', 'BG_Pool', 'B_Ground']
+
+  root.traverse((object) => {
+    if (!object.isMesh) return
+
+    const nodeName = (object.name || '').toLowerCase()
+    const materialNames = Array.isArray(object.material)
+      ? object.material.map((material) => (material?.name || '').toLowerCase())
+      : [(object.material?.name || '').toLowerCase()]
+
+    const shouldHideByNode = hiddenNodePrefixes.some((prefix) => object.name?.startsWith(prefix))
+      || hiddenKeywords.some((keyword) => nodeName.includes(keyword))
+    const shouldHideByMaterial = materialNames.some((name) => hiddenKeywords.some((keyword) => name.includes(keyword)))
+
+    if (shouldHideByNode || shouldHideByMaterial) {
+      object.visible = false
+    }
+  })
+}
+
+function GardenObject({ item, parcelWidth, parcelDepth }) {
+  const position = [item.x - parcelWidth / 2, 0, item.z - parcelDepth / 2]
+
   switch (item.key) {
     case 'lavande':
-      return <LavenderPatch position={[item.sceneX, 0, item.sceneZ]} />
+      return <LavenderPatch position={position} />
     case 'olivier':
-      return <OliveTree position={[item.sceneX, 0, item.sceneZ]} />
+      return <OliveTree position={position} />
     case 'cypres':
-      return <CypressTree position={[item.sceneX, 0, item.sceneZ]} />
+      return <CypressTree position={position} />
     case 'piscine':
-      return <Pool position={[item.sceneX, 0, item.sceneZ]} />
+      return <Pool position={position} />
     case 'terrasse':
-      return <Terrace position={[item.sceneX, 0, item.sceneZ]} />
+      return <Terrace position={position} />
     case 'pergola':
-      return <Pergola position={[item.sceneX, 0, item.sceneZ]} />
+      return <Pergola position={position} />
     case 'haie':
-      return <Hedge position={[item.sceneX, 0, item.sceneZ]} />
+      return <Hedge position={position} />
     case 'bassin':
-      return <Pond position={[item.sceneX, 0, item.sceneZ]} />
+      return <Pond position={position} />
     default:
       return null
   }

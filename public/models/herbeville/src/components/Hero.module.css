@@ -31,6 +31,13 @@
   object-position: center 40%;
 }
 
+.heroVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
 .slidePlaceholder {
   position: absolute;
   inset: 0;
@@ -66,26 +73,6 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.45);
-}
-
-.dots {
-  display: flex;
-  gap: 5px;
-}
-
-.dot {
-  width: 20px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.25);
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  padding: 0;
-}
-
-.dotActive {
-  background: white;
-  width: 32px;
 }
 
 .content {

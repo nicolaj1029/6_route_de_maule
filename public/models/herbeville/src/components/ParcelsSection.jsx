@@ -53,12 +53,12 @@ function ParcelCard({ parcel, setConfig }) {
           <button
             className={s.viewBtn}
             onClick={() => {
-              setConfig((current) => ({ ...current, house: parcel.houseKey }))
+              setConfig((current) => ({ ...current, house: parcel.houseKey, parcelId: parcel.id }))
               document.getElementById('configurateur')?.scrollIntoView({ behavior: 'smooth' })
             }}
             type="button"
           >
-            Configurer ce projet
+            Configurer la parcelle {parcel.id}
           </button>
         </div>
       </div>

@@ -11,7 +11,7 @@ export default function Footer() {
         <span className={s.coords}>
           {PROPERTY.lat} N, {PROPERTY.lng} E
         </span>
-        <span className={s.stack}>React - Vite - model-viewer - Formspree - Blender</span>
+        <span className={s.stack}>React - Vite - React Three Fiber - Formspree - Blender</span>
       </div>
     </footer>
   )

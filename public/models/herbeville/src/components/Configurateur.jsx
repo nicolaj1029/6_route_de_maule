@@ -1,22 +1,25 @@
-import { useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { assetPath } from '../config/assets.js'
-import ModelViewer from './ModelViewer.jsx'
 import s from './Configurateur.module.css'
+
+const ThreeSceneViewer = lazy(() => import('./ThreeSceneViewer.jsx'))
 
 const HOUSE_STYLES = [
   {
     key: 'normande',
     label: 'Maison normande',
     desc: 'Colombages, volets, allure vernaculaire',
-    glb: assetPath('models/parcel-a-maison-normande.glb'),
+    glb: assetPath('models/maison-normande.glb'),
     render: assetPath('images/terrain-01.png'),
+    parcel: { width: 42, depth: 30, houseWidth: 13.5, houseDepth: 9.5, houseX: 19, houseZ: 16, rotation: 0.08 },
   },
   {
     key: 'villa',
     label: 'Villa contemporaine',
     desc: 'Toit plat, verre, zinc, vie dedans-dehors',
-    glb: assetPath('models/parcel-b-villa-moderne.glb'),
+    glb: assetPath('models/villa-moderne.glb'),
     render: assetPath('images/terrain-02.png'),
+    parcel: { width: 48, depth: 16, houseWidth: 16, houseDepth: 9, houseX: 19, houseZ: 8, rotation: 0 },
   },
   {
     key: 'bois',
@@ -24,6 +27,7 @@ const HOUSE_STYLES = [
     desc: 'Ossature bois, zinc, veranda',
     glb: assetPath('models/chalet-bois.glb'),
     render: assetPath('images/terrain-01.png'),
+    parcel: { width: 42, depth: 30, houseWidth: 12, houseDepth: 8, houseX: 18, houseZ: 15, rotation: -0.05 },
   },
   {
     key: 'bungalow',
@@ -31,6 +35,7 @@ const HOUSE_STYLES = [
     desc: 'Plain-pied, pergola, terrasse',
     glb: assetPath('models/bungalow.glb'),
     render: assetPath('images/terrain-02.png'),
+    parcel: { width: 42, depth: 30, houseWidth: 15, houseDepth: 8.5, houseX: 20, houseZ: 15, rotation: 0 },
   },
 ]
 
@@ -61,42 +66,60 @@ const DROP_POINTS = [
   { x: 74, y: 34 },
 ]
 
+function makePlacedElement(key, index = 0) {
+  const element = GARDEN_ELEMENTS.find((item) => item.key === key)
+  const point = DROP_POINTS[index % DROP_POINTS.length]
+  if (!element) return null
+
+  return {
+    ...element,
+    id: `${key}_${Date.now()}_${index}`,
+    x: point.x,
+    y: point.y,
+  }
+}
+
+function makePresetElements(houseKey) {
+  return (PRESETS[houseKey] ?? []).map((presetKey, index) => makePlacedElement(presetKey, index)).filter(Boolean)
+}
+
 export default function Configurateur({ config, setConfig }) {
   const [viewerActive, setViewerActive] = useState(false)
-  const [placedElements, setPlacedElements] = useState([])
+  const [placedElements, setPlacedElements] = useState(() => makePresetElements(config.house))
   const [dragEl, setDragEl] = useState(null)
   const groundRef = useRef(null)
 
   const house = HOUSE_STYLES.find((item) => item.key === config.house) || HOUSE_STYLES[0]
   const uniqueLabels = useMemo(() => [...new Set(placedElements.map((item) => item.label))], [placedElements])
 
-  const makePlacedElement = (key, index = 0) => {
-    const element = GARDEN_ELEMENTS.find((item) => item.key === key)
-    const point = DROP_POINTS[index % DROP_POINTS.length]
-    if (!element) return null
-
-    return {
-      ...element,
-      id: `${key}_${Date.now()}_${index}`,
-      x: point.x,
-      y: point.y,
-    }
-  }
+  useEffect(() => {
+    const nextPlaced = makePresetElements(config.house)
+    setPlacedElements(nextPlaced)
+  }, [config.house])
 
   const selectHouse = (key) => {
-    setConfig((current) => ({ ...current, house: key }))
-    setPlacedElements(PRESETS[key].map((presetKey, index) => makePlacedElement(presetKey, index)).filter(Boolean))
+    const nextPlaced = makePresetElements(key)
+    setConfig((current) => ({ ...current, house: key, garden: nextPlaced.map((item) => item.key) }))
+    setPlacedElements(nextPlaced)
     setViewerActive(false)
   }
 
   const addElement = (key, pointIndex = placedElements.length) => {
     const next = makePlacedElement(key, pointIndex)
     if (!next) return
-    setPlacedElements((current) => [...current, next])
+    setPlacedElements((current) => {
+      const updated = [...current, next]
+      setConfig((cfg) => ({ ...cfg, garden: updated.map((item) => item.key) }))
+      return updated
+    })
   }
 
   const removeElement = (id) => {
-    setPlacedElements((current) => current.filter((item) => item.id !== id))
+    setPlacedElements((current) => {
+      const updated = current.filter((item) => item.id !== id)
+      setConfig((cfg) => ({ ...cfg, garden: updated.map((item) => item.key) }))
+      return updated
+    })
   }
 
   const handleGroundDrop = (event) => {
@@ -109,7 +132,11 @@ export default function Configurateur({ config, setConfig }) {
     const element = GARDEN_ELEMENTS.find((item) => item.key === dragEl)
 
     if (element) {
-      setPlacedElements((current) => [...current, { ...element, id: `${dragEl}_${Date.now()}`, x, y }])
+      setPlacedElements((current) => {
+        const updated = [...current, { ...element, id: `${dragEl}_${Date.now()}`, x, y }]
+        setConfig((cfg) => ({ ...cfg, garden: updated.map((item) => item.key) }))
+        return updated
+      })
     }
 
     setDragEl(null)
@@ -171,14 +198,20 @@ export default function Configurateur({ config, setConfig }) {
             {viewerActive ? 'Fermer la vue 3D' : 'Ouvrir la vue 3D'}
           </button>
           <p className={s.viewerNote}>
-            La vue 3D montre l&apos;implantation generale exportee depuis Blender. Les ajouts jardin restent
-            visibles sur le plan 2D dans cette version.
+            La vue 3D repose sur une parcelle calibree en metres. Les ajouts jardin du plan 2D y sont
+            reconstitues comme objets 3D legers dans cette version.
           </p>
         </div>
 
         <div className={s.preview}>
           {viewerActive ? (
-            <ModelViewer glb={house.glb} label={house.label} onClose={() => setViewerActive(false)} />
+            <Suspense fallback={<div className={s.sceneLoading}>Chargement de la scene 3D...</div>}>
+              <ThreeSceneViewer
+                house={house}
+                placedElements={placedElements}
+                onClose={() => setViewerActive(false)}
+              />
+            </Suspense>
           ) : (
             <div
               ref={groundRef}
@@ -237,7 +270,14 @@ export default function Configurateur({ config, setConfig }) {
               <strong>{house.label}</strong>
             </span>
             {uniqueLabels.length > 0 && <span className={s.summaryGarden}>+ {uniqueLabels.join(', ')}</span>}
-            <button className={s.summaryClear} onClick={() => setPlacedElements([])} type="button">
+            <button
+              className={s.summaryClear}
+              onClick={() => {
+                setPlacedElements([])
+                setConfig((cfg) => ({ ...cfg, garden: [] }))
+              }}
+              type="button"
+            >
               Reinitialiser
             </button>
           </div>

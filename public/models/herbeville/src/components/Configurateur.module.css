@@ -166,6 +166,18 @@
   gap: 1rem;
 }
 
+.sceneLoading {
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #ece3d4 0%, #d2c9bb 100%);
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .ground {
   position: relative;
   background: #E0D8C8;

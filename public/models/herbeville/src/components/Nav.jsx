@@ -1,16 +1,33 @@
-import styles from './Nav.module.css'
+import { useEffect, useState } from 'react'
+import s from './Nav.module.css'
 
 export default function Nav() {
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const [scrolled, setScrolled] = useState(false)
+  const scroll = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <nav className={styles.nav}>
-      <span className={styles.logo}>Herbeville | Route Maule</span>
-      <div className={styles.links}>
-        <button className={styles.link} onClick={() => scrollTo('map-sec')}>Carte</button>
-        <button className={styles.link} onClick={() => scrollTo('config-sec')}>Projet</button>
-        <button className={styles.link} onClick={() => scrollTo('contact-sec')}>Contact</button>
-        <button className={styles.cta} onClick={() => scrollTo('contact-sec')}>
+    <nav className={`${s.nav} ${scrolled ? s.navScrolled : ''}`}>
+      <span className={s.logo}>Herbeville</span>
+      <div className={s.links}>
+        <button className={s.link} onClick={() => scroll('parcelles')} type="button">
+          Parcelles
+        </button>
+        <button className={s.link} onClick={() => scroll('acces')} type="button">
+          Acces
+        </button>
+        <button className={s.link} onClick={() => scroll('configurateur')} type="button">
+          Projet
+        </button>
+        <button className={s.link} onClick={() => scroll('contact')} type="button">
+          Contact
+        </button>
+        <button className={s.cta} onClick={() => scroll('contact')} type="button">
           Demande de visite
         </button>
       </div>

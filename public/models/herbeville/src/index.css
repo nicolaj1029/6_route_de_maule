@@ -1,9 +1,4 @@
-/* ============================================================
-   HERBEVILLE — Global CSS
-   Mobile-first. CSS custom properties as design tokens.
-   ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -12,142 +7,170 @@
 }
 
 :root {
-  /* Brand palette */
-  --cream:       #F7F4EE;
-  --stone:       #E8E3D9;
-  --warm:        #C8B89A;
-  --terracotta:  #B5613A;
-  --terracotta-dark: #9A4F2E;
-  --sage:        #5C7A5C;
-  --sage-light:  #EFF5EF;
-  --night:       #1A1A18;
-  --gold:        #C9A84C;
-  --text:        #2C2820;
-  --muted:       #7A7060;
+  --cream: #F5F1EA;
+  --parchment: #EDE8DE;
+  --stone: #D6CFBF;
+  --warm: #C4A882;
+  --rust: #A84E2A;
+  --rust-deep: #8A3D1E;
+  --sage: #4E6B46;
+  --night: #18181A;
+  --night-soft: #252525;
+  --gold: #C49A3C;
+  --muted: #78715E;
+  --text: #1E1C18;
 
-  /* Typography */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'DM Sans', system-ui, sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Jost', system-ui, sans-serif;
 
-  /* Spacing */
-  --section-px: 2rem;
-  --section-py: 3.5rem;
-
-  /* Radius */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-
-  /* Transitions */
-  --transition: 0.2s ease;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
-  font-family: var(--font-sans);
-  background:
-    radial-gradient(circle at top right, rgba(201, 168, 76, 0.08), transparent 28%),
-    linear-gradient(180deg, #fbf8f2 0%, var(--cream) 30%, #f5f0e6 100%);
+  font-family: var(--sans);
+  background: var(--cream);
   color: var(--text);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
-  font-family: var(--font-serif);
-  font-weight: 300;
+.t-display {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.t-display em {
+  font-style: italic;
+  color: var(--rust);
 }
 
-button {
-  cursor: pointer;
-  font-family: var(--font-sans);
+.t-heading {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* Utility */
-.serif { font-family: var(--font-serif); }
-
-.section-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.15em;
+.t-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--terracotta);
-  margin-bottom: 0.5rem;
   font-weight: 500;
-  display: block;
+  color: var(--rust);
 }
 
-.section-title {
-  font-family: var(--font-serif);
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
-  font-weight: 300;
-  color: var(--night);
-  line-height: 1.15;
-  margin-bottom: 0.8rem;
-}
-
-.section-body {
-  font-size: 0.88rem;
+.t-body {
+  font-size: 0.9rem;
+  line-height: 1.75;
   color: var(--muted);
-  line-height: 1.7;
-  max-width: 500px;
+  font-weight: 300;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  text-decoration: none;
+  border: none;
 }
 
 .btn-primary {
-  background: var(--terracotta);
-  color: white;
-  border: none;
-  padding: 0.85rem 1.8rem;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
-  display: inline-block;
-  text-decoration: none;
+  background: var(--rust);
+  color: #fff;
 }
+
 .btn-primary:hover {
-  background: var(--terracotta-dark);
-  transform: translateY(-1px);
+  background: var(--rust-deep);
+  transform: translateY(-2px);
 }
 
 .btn-outline {
   background: transparent;
   color: var(--night);
-  border: 1px solid var(--warm);
-  padding: 0.85rem 1.5rem;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  transition: border-color var(--transition), color var(--transition);
-}
-.btn-outline:hover {
-  border-color: var(--terracotta);
-  color: var(--terracotta);
+  border: 1px solid var(--stone);
 }
 
+.btn-outline:hover {
+  border-color: var(--rust);
+  color: var(--rust);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.section {
+  padding: 6rem 2rem;
+}
+
+.section--dark {
+  background: var(--night);
+  color: var(--cream);
+}
+
+.section--parchment {
+  background: var(--parchment);
+}
+
+.section--white {
+  background: #fff;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-fade-up {
+  animation: fadeUp 0.9s var(--ease-out) both;
+}
+
+.anim-delay-1 { animation-delay: 0.15s; }
+.anim-delay-2 { animation-delay: 0.30s; }
+.anim-delay-3 { animation-delay: 0.45s; }
+.anim-delay-4 { animation-delay: 0.60s; }
+
 @media (max-width: 640px) {
+  .btn,
   .btn-primary,
-  .btn-outline {
+  .btn-outline,
+  .btn-ghost {
     width: 100%;
     justify-content: center;
   }

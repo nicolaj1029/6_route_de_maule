@@ -1,0 +1,138 @@
+.section { padding: 7rem 2rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.heading { margin-top: 0.5rem; }
+
+.box {
+  background: white;
+  border: 1px solid var(--stone);
+  padding: 1.8rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+}
+
+.chip {
+  background: var(--parchment);
+  border: 1px solid var(--stone);
+  border-radius: 2px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.68rem;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.chip:hover {
+  border-color: var(--rust);
+  color: var(--rust);
+}
+
+.inputRow {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--stone);
+}
+
+.input {
+  flex: 1;
+  border: none;
+  padding: 0.8rem 1rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--cream);
+  outline: none;
+}
+
+.input::placeholder { color: var(--stone); }
+
+.send {
+  background: var(--night);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: var(--sans);
+}
+
+.send:hover { background: var(--rust); }
+.send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.result {
+  margin-top: 1.2rem;
+  padding: 1.2rem;
+  background: var(--parchment);
+  border-left: 3px solid var(--sage);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.vision {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--sage);
+  line-height: 1.6;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  background: var(--sage);
+  color: white;
+  font-size: 0.62rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.blenderPrompt {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: var(--night);
+  padding: 0.7rem 0.9rem;
+  border-radius: 2px;
+}
+
+.blenderIcon {
+  color: var(--gold);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.blenderPrompt code {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: monospace;
+  line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
